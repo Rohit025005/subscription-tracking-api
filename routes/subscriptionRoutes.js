@@ -21,7 +21,7 @@ subRouter.get('/', async (req, res, next) => {
 subRouter.get('/:id',authorize,getUserSubs);
 
 //create  a new  subscription by id
-subRouter.post('/',authorize,createSubscription);
+subRouter.post('/newSub',authorize,createSubscription);
 
 
 export default subRouter;

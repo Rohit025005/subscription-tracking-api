@@ -25,7 +25,7 @@ export const subSchema = new mongoose.Schema({
     },
     catagory:{
         type:String,
-        enum:['sports','news','enternainment','tech','music','other'],
+        enum:['sports','news','entertainment','tech','music','other'],
         required:true
     },
     frequency: {

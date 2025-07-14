@@ -6,7 +6,7 @@ const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000';
 export const createSubscription = async (req,res,next) =>{
     try {
         const subscription = await Subcsription.create({...req.body,
-            user : req.user_id,
+            user : req.user._id,
         });
         const { workflowRunId } = await workFlowClient.trigger({
       url: `${SERVER_URL}/api/v1/workflows/subscription/reminder`,
