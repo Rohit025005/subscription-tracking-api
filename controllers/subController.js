@@ -1,7 +1,7 @@
 import { workFlowClient } from '../config/upstash.js';
 import Subcsription from'../models/subModel.js';
 
-const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000';
+const SERVER_URL = process.env.SERVER_URL ;
 
 export const createSubscription = async (req,res,next) =>{
     try {
@@ -9,7 +9,7 @@ export const createSubscription = async (req,res,next) =>{
             user : req.user._id,
         });
         const { workflowRunId } = await workFlowClient.trigger({
-      url: `${SERVER_URL}/api/v1/workflows/subscription/reminder`,
+      url: `${SERVER_URL}/api/v1/workflows/subscription/newSub/reminder`,
       body: {
         subscriptionId: subscription.id,
       },
@@ -18,7 +18,7 @@ export const createSubscription = async (req,res,next) =>{
       },
       retries: 0,
     })
-        res.status(201).json({success:true,data:subscription});
+        res.status(201).json({success:true,data:subscription ,workflowRunId});
     } catch (error) {
         next(error)
     }
@@ -35,7 +35,11 @@ export const getUserSubs = async(req,res,next) =>{
         }
 
         const subscription = await Subcsription.find({user:req.params.id});
-
+      if (!subscription) {
+      const error = new Error("Subscription not found");
+      error.statusCode = 404;
+      throw error;
+    }
         res.status(201).json({success:true,data:subscription});
     } catch (error) {
         next(error)
