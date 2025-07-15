@@ -13,7 +13,7 @@ export const subSchema = new mongoose.Schema({
     price:{
         type:Number,
         required:true,
-        unique:true,
+       
         min:0
     },
     currency:{

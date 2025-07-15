@@ -24,9 +24,9 @@ export const signUp = async (req,res,next) => {
 
          const newUsers = await User.create([{name,email,hashedPassword}],{session})
 
-         const token = jwt.sign({userId:newUsers[0]._id},JWT_SECRET,{options:{
+         const token = jwt.sign({userId:newUsers[0]._id},JWT_SECRET,{
             expiresIn:JWT_EXPIRES_IN
-         }})
+         })
         await session.commitTransaction();
         session.endSession();
 
@@ -67,9 +67,7 @@ try {
         throw error;
     }
 
-    const token = jwt.sign({userId:user._id},JWT_SECRET,{options:{
-            expiresIn:JWT_EXPIRES_IN
-         }});
+    const token = jwt.sign({userId:user._id},JWT_SECRET,{expiresIn:JWT_EXPIRES_IN});
 
          res.status(200)
         .json({

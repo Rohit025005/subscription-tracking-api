@@ -3,8 +3,8 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const { serve } = require("@upstash/workflow/express");
 
-import Subscription from "../models/subModel.js";
-import { sendReminderEmail } from "../utils/send-email.js";
+import Subcsription from "../models/subModel.js"; // ✅ Adjust this path if needed
+import { sendReminderEmail } from "../utils/send-email.js"; // ✅ Adjust this path if needed
 
 const reminders = [
   { label: "7 days before reminder", daysBefore: 7 },
@@ -18,21 +18,19 @@ export const sendReminders = serve(async (context) => {
   const { subscriptionId } = context.requestPayload;
 
   const subscription = await context.run("get subscription", async () => {
-    return await Subscription.findById(subscriptionId).populate(
+    return await Subcsription.findById(subscriptionId).populate(
       "user",
       "name email"
     );
   });
 
   if (!subscription) {
-    console.error("Subscription not found");
+    console.error("❌ Subscription not found");
     return;
   }
 
   if (subscription.status !== "active") {
-    console.log(
-      `Subscription "${subscription.name}" is not active. Stopping workflow.`
-    );
+    console.log(`⚠️ Subscription "${subscription.name}" is not active. Stopping workflow.`);
     return;
   }
 
@@ -50,9 +48,7 @@ export const sendReminders = serve(async (context) => {
   });
 
   if (result.shouldStop) {
-    console.log(
-      `Renewal date of ${subscription.name} is in the past. Stopping workflow.`
-    );
+    console.log(`⛔ Renewal date of ${subscription.name} is in the past. Stopping workflow.`);
     return;
   }
 
@@ -63,18 +59,13 @@ export const sendReminders = serve(async (context) => {
     const reminderDate = renewalDate.subtract(reminder.daysBefore, "day");
 
     if (now.isBefore(reminderDate)) {
-      console.log(
-        `Sleeping until next reminder: ${
-          reminder.label
-        } on ${reminderDate.toISOString()}`
-      );
-
+      console.log(`🕒 Sleeping until ${reminder.label} on ${reminderDate.toISOString()}`);
       await context.sleepUntil(reminder.label, reminderDate.toDate());
-      now = dayjs(); // Update current time after waking up
+      now = dayjs(); // Update time after waking up
     }
 
     if (now.isSame(reminderDate, "day")) {
-      console.log(`Sending ${reminder.label} email.`);
+      console.log(`📨 Sending ${reminder.label} email.`);
 
       await context.run(reminder.label, async () => {
         console.log(`${reminder.label} triggered at ${dayjs().toISOString()}`);
@@ -86,9 +77,8 @@ export const sendReminders = serve(async (context) => {
         });
       });
 
-      // If it's the final day reminder, stop the workflow
       if (reminder.daysBefore === 0) {
-        console.log("Final day reached. Stopping workflow.");
+        console.log("✅ Final day reached. Workflow complete.");
         return;
       }
     }
