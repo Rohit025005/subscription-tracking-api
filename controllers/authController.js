@@ -22,7 +22,7 @@ export const signUp = async (req,res,next) => {
          const salt = await bcrypt.genSalt(10);
          const hashedPassword = await bcrypt.hash(password,salt);
 
-         const newUsers = await User.create([{name,email,hashedPassword}],{session})
+         const newUsers = await User.create([{name,email, password: hashedPassword}],{session})
 
          const token = jwt.sign({userId:newUsers[0]._id},JWT_SECRET,{
             expiresIn:JWT_EXPIRES_IN
@@ -42,7 +42,7 @@ export const signUp = async (req,res,next) => {
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
-        console.error("error in sigh-up",error.message)
+        console.error("error in sign-up",error.message)
         next(error)
     }
 }
@@ -81,9 +81,6 @@ try {
 } catch (error) {
     next(error)
 }    
-}
-export const signOut = async (req,res,next) => {
-    
 }
 
 

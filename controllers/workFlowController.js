@@ -3,8 +3,8 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const { serve } = require("@upstash/workflow/express");
 
-import Subcsription from "../models/subModel.js"; // ✅ Adjust this path if needed
-import { sendReminderEmail } from "../utils/send-email.js"; // ✅ Adjust this path if needed
+import Subcsription from "../models/subModel.js";
+import { sendReminderEmail } from "../utils/send-email.js"; 
 
 const reminders = [
   { label: "7 days before reminder", daysBefore: 7 },
@@ -23,7 +23,7 @@ export const sendReminders = serve(async (context) => {
       "name email"
     );
   });
-
+  console.log(subscription)
   if (!subscription) {
     console.error("❌ Subscription not found");
     return;

@@ -23,3 +23,4 @@ This file documents the recent changes made to the subscription tracker applicat
 ### 4. API Routes
 - **`routes/subscriptionRoutes.js`**: Implemented the previously empty `GET /` route to allow fetching all subscriptions.
 - **`routes/usersRoutes.js`**: Implemented the empty `POST /`, `PUT /:id`, and `DELETE /:id` routes to provide full CRUD functionality for users.
+ 

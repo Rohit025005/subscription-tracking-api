@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+import dayjs from "dayjs";
 
 
 export const subSchema = new mongoose.Schema({
@@ -13,7 +13,6 @@ export const subSchema = new mongoose.Schema({
     price:{
         type:Number,
         required:true,
-       
         min:0
     },
     currency:{
@@ -23,7 +22,7 @@ export const subSchema = new mongoose.Schema({
         required:true
         
     },
-    catagory:{
+    category:{
         type:String,
         enum:['sports','news','entertainment','tech','music','other'],
         required:true
@@ -39,15 +38,29 @@ export const subSchema = new mongoose.Schema({
         default:'active',
             
         },
-        startDate:{
-            type:Date,
-            validate:function(value){ value <= new Date()},
-            message:'start date must be in the past'
+         startDate:{
+        type:Date,
+        // Using a proper validator object
+        validate: {
+            validator: function(value){
+                
+                return value <= new Date();
+            },
+            message: 'Start date cannot be in the future.'
         },
-        renewalDate:{
-            type:Date,
-            validate:function (value) {value > this.startDate},
-            message:'start date must be after start date'
+        required: true 
+    },
+            renewalDate:{
+        type:Date,
+        
+        validate: {
+            validator: function (value) {
+             
+                return this.startDate && value > this.startDate;
+            },
+            message:'Renewal date must be after the start date.'
+        },
+      
         },user:{
             type:mongoose.Schema.Types.ObjectId,
             ref:'User',
@@ -56,23 +69,37 @@ export const subSchema = new mongoose.Schema({
         }
 });
 
-//auto calculates the renewwal date before saving
-subSchema.pre('save',function(next){
-    if(!this.renewalDate){
-        const renewalPeriod={
-            daily:1,
-            weekly:7,
-            monthly:30,
-            yearly:365
-        };
 
-        this.renewalDate = new Date(this.startDate);
-        this.renewalDate.setDate(this.renewalDate.getDate() + renewalPeriod[this.frequency])
+subSchema.pre('save', function(next){
+  
+    if (!this.renewalDate || this.isModified('startDate') || this.isModified('frequency')) {
+        if (!this.startDate || !this.frequency) {
+            return next(new Error('startDate and frequency are required for renewalDate calculation.'));
+        }
+
+        let nextRenewal;
+        const startDayjs = dayjs(this.startDate);
+
+        switch(this.frequency) {
+            case 'daily':
+                nextRenewal = startDayjs.add(1, 'day');
+                break;
+            case 'weekly':
+                nextRenewal = startDayjs.add(1, 'week');
+                break;
+            case 'monthly':
+                nextRenewal = startDayjs.add(1, 'month');
+                break;
+            case 'yearly':
+                nextRenewal = startDayjs.add(1, 'year');
+                break;
+            default:
+                return next(new Error('Invalid frequency for renewal date calculation.'));
+        }
+        this.renewalDate = nextRenewal.toDate();
     }
-
-    //auto update 
-    if(this.renewalDate < new Date()){
-        this.status = 'expired'
+    if(this.renewalDate < new Date() && this.status !== 'cancelled') { 
+        this.status = 'expired';
     }
     next();
 });

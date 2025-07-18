@@ -22,9 +22,9 @@ app.use(limiter);
 
 
 
-app.use('/api/v1/auth',limiter, authRouter);
-app.use('/api/v1/users', limiter,userRouter);
-app.use('/api/v1/subscription', subRouter);
+app.use('/api/v1/auth',limiter, authRouter);  // ✅limiter  ✅ authRouter
+app.use('/api/v1/users', limiter,userRouter);//✅limiter  ✅ userRouter
+app.use('/api/v1/subscription', subRouter); 
 app.use('/api/v1/workflows', workFlowRouter);
 
 app.use(errorMiddleware);
@@ -34,6 +34,7 @@ const startServer = async () => {
     await connectToDB();
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
+      console.log("SERVER_URL:", process.env.SERVER_URL);
     });
   } catch (err) {
     console.error("Failed to connect to DB:", err.message);
