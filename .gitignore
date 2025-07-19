@@ -62,7 +62,8 @@ typings/
 # next.js build output
 .next
 
-CHANGELOG
+CHANGELOG.md
+subscription_tracker_spec.md
 
 arcjetMiddleware.js
 

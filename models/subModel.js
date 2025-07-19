@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 export const subSchema = new mongoose.Schema({
     name:{
         type:String,
-        unique:true,
+        unique:false,
         required:true,
         minLength : 2,
         maxLength : 100
