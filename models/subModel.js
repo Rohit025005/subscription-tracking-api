@@ -15,6 +15,11 @@ export const subSchema = new mongoose.Schema({
         required:true,
         min:0
     },
+    paymentMethod:{
+        type:String,
+        enum:['card','upi','net banking'],
+        required:true
+    },
     currency:{
         type:String,
         enum:['INR','USD','EUR','GBP'],
